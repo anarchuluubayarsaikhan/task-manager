@@ -64,7 +64,7 @@ export default {
     async resetPassword() {
       try {
         await sendPasswordResetEmail(auth, this.email);
-        alert("Password reset email sent.");
+        this.$toast.success(`Password reset email sent.`);
       } catch (error) {
         this.$toast.error(`Could not reset password! ${error}`);
       }
