@@ -23,7 +23,6 @@
 </template>
 <script>
 import { auth, signInWithEmailAndPassword, sendPasswordResetEmail, sendEmailVerification, signOut } from "@/firebase"; 
-
 export default {
   data() {
     return {
@@ -43,7 +42,7 @@ export default {
       this.isLoading = true; 
       try {
         await signInWithEmailAndPassword(auth, this.email, this.password);
-        window.location.href = '/home'
+        this.$router.push('/home');
       } catch (error) {
         this.$toast.error(`Could not sign in! ${error}`);
       } finally {
