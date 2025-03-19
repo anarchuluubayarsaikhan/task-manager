@@ -38,11 +38,34 @@ export default {
   },
   props: {
     columnTitle: String,
-    tasks: Array
+    tasks: Array,
+    priorityLevels: Object,
+    duedateOptions: Object
   },
   computed: {
+    formattedDate() {
+      const date = new Date();
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, '0');
+      const day = String(date.getDate()).padStart(2, '0');
+      return `${year}-${month}-${day}`;
+    },
     filteredTasks() {
-      const filtered = this.tasks.filter(task => task.status === this.columnTitle);
+      let filtered = this.tasks.filter(task => task.status === this.columnTitle);
+      if (this.priorityLevels.low || this.priorityLevels.medium || this.priorityLevels.high) {
+        filtered = filtered.filter(task => {
+          return (this.priorityLevels.low && task.priority === "Low") ||
+            (this.priorityLevels.medium && task.priority === "Medium") ||
+            (this.priorityLevels.high && task.priority === "High");
+        });
+      }
+      if (this.duedateOptions.upcoming || this.duedateOptions.today || this.duedateOptions.overdue) {
+            filtered = filtered.filter(task => {
+              return (this.duedateOptions.upcoming && task.duedate > this.formattedDate) ||
+                (this.duedateOptions.today && task.duedate == this.formattedDate) ||
+                (this.priorityLevels.overdue && task.duedate < this.formattedDate);
+            });
+          }
       return filtered;
     }
   },
@@ -55,8 +78,8 @@ export default {
         name: "",
         description: "",
         duedate: "",
-        status: "Not Started", 
-        priority:"Low"
+        status: "Not Started",
+        priority: "Low"
       },
       isVisible: false,
     }
