@@ -1,26 +1,31 @@
 <template>
   <div class="kanban-column">
-    <h3 class="column-title">Column name</h3>
+    <h3 class="column-title">{{ columnTitle }}</h3>
     <div class="kanban-cards">
-      <KanbanCard />
+      <KanbanCard v-for="task in filteredTasks" :key="task.id" :task="task" @taskUpdated="onTaskUpdated" />
     </div>
-    <div class="kanban-card">
-        <div class="task-add">
-          <input placeholder="Task Name" class="input-field" v-model="task.name" required/>
-          <textarea placeholder="Description" v-model="task.description" required></textarea>
-          <input type="date" class="input-field" v-model="task.duedate" required/>
-          <select class="input-field" v-model="task.status" required>
-            <option value="Not Started">Not Started</option>
-            <option value="In Progress">In Progress</option>
-            <option value="Completed">Completed</option>
-          </select>
-          <div id="button-container">
-            <button class="cancel-button">Cancel</button>
-            <button @click="saveTask" class="save-button">Add</button>
-          </div>
+    <div class="kanban-card" v-if="isVisible">
+      <div class="task-add">
+        <input placeholder="Task Name" class="input-field" v-model="task.name" required />
+        <textarea placeholder="Description" v-model="task.description" required></textarea>
+        <input type="date" class="input-field" v-model="task.duedate" required />
+        <select class="input-field" v-model="task.status" required>
+          <option value="Not Started">Not Started</option>
+          <option value="In Progress">In Progress</option>
+          <option value="Completed">Completed</option>
+        </select>
+        <select class="input-field" v-model="task.priority" required>
+          <option value="Low">Low</option>
+          <option value="Medium">Medium</option>
+          <option value="High">High</option>
+        </select>
+        <div id="button-container">
+          <button class="cancel-button" @click="cancel">Cancel</button>
+          <button @click="saveTask" class="save-button">Add</button>
         </div>
       </div>
-    <button class="add-task-button">+ Add Task</button>
+    </div>
+    <button class="add-task-button" @click="addTask">+ Add Task</button>
   </div>
 </template>
 
@@ -31,43 +36,60 @@ export default {
   components: {
     KanbanCard
   },
+  props: {
+    columnTitle: String,
+    tasks: Array
+  },
+  computed: {
+    filteredTasks() {
+      const filtered = this.tasks.filter(task => task.status === this.columnTitle);
+      return filtered;
+    }
+  },
+  onTaskUpdated() {
+    this.$emit('taskUpdated');
+  },
   data() {
     return {
       task: {
         name: "",
         description: "",
         duedate: "",
-        status: ""
-      }
+        status: "Not Started", 
+        priority:"Low"
+      },
+      isVisible: false,
     }
   },
   methods: {
     async saveTask() {
-  try {
-    const user = auth.currentUser;
-    if (user) {
-      console.log(this.task.name, this.task.description, this.task.duedate, this.task.status, user.uid);
-      await addDoc(collection(db, "task"), {
-        name: this.task.name,
-        description: this.task.description,
-        duedate: this.task.duedate,
-        status: this.task.status,
-        user: user.uid
-      });
-      this.task={}
-      this.$toast.success('Successfully added task');
-    }
-  } catch (error) {
-    console.log(error);
-    this.$toast.error(`Could not add task! ${error}`);
-  }
-},
-    updateTask() {
-      console.log("update task")
+      try {
+        const user = auth.currentUser;
+        if (user) {
+          await addDoc(collection(db, "task"), {
+            name: this.task.name,
+            description: this.task.description,
+            duedate: this.task.duedate,
+            status: this.task.status,
+            priority: this.task.priority,
+            user: user.uid
+          });
+          this.task = {}
+          this.$toast.success('Successfully added task');
+        }
+      } catch (error) {
+        this.$toast.error(`Could not add task! ${error}`);
+      }
     },
-    deleteTask() {
-      console.log("delete task")
-    }
+    addTask() {
+      this.isVisible = true
+    },
+    cancel() {
+      this.isVisible = false
+    },
+    onTaskUpdated() {
+      this.$emit('taskUpdated');
+    },
   }
 };
 </script>

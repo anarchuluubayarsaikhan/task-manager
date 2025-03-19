@@ -1,18 +1,72 @@
 <template>
   <div class="kanban-board">
-    <KanbanColumn />
+    <KanbanColumn :columnTitle="'Not Started'" :tasks="notStartedTasks" @taskUpdated="getTasks" />
+    <KanbanColumn :columnTitle="'In Progress'" :tasks="inProgressTasks" @taskUpdated="getTasks" />
+    <KanbanColumn :columnTitle="'Completed'" :tasks="completedTasks" @taskUpdated="getTasks" />
   </div>
 </template>
 <script>
 import KanbanColumn from './KanbanColumn.vue';
+import { addDoc, collection, db, auth, onSnapshot, query, where, } from '../firebase';
 export default {
+  data() {
+    return {
+      tasks: [],
+    }
+  },
   components: {
     KanbanColumn
   },
-  data() {
-    return {
-    };
+  created() {
+    this.getTasks()
   },
+  computed: {
+    notStartedTasks() {
+      return this.tasks.filter((task) => task.status == "Not Started")
+    },
+    inProgressTasks() {
+      return this.tasks.filter((task) => task.status == "In Progress")
+    },
+    completedTasks() {
+      return this.tasks.filter((task) => task.status == "Completed")
+    },
+  },
+  methods: {
+      async saveTask() {
+        try {
+          const user = auth.currentUser;
+          if (user) {
+            await addDoc(collection(db, "task"), {
+              name: this.task.name,
+              description: this.task.description,
+              duedate: this.task.duedate,
+              status: this.task.status,
+              user: user.uid
+            });
+            this.task = {}
+            this.$toast.success('Successfully added task');
+          }
+        } catch (error) {
+          console.log(error);
+          this.$toast.error(`Could not add task! ${error}`);
+        }
+      },
+      async getTasks() {
+        const user = auth.currentUser;
+        const tasksCollection = collection(db, "task")
+        const tasksQuery = query(tasksCollection, where("user", "==", user.uid))
+        onSnapshot(tasksQuery, (snapshot) => {
+          this.tasks = snapshot.docs.map((doc) => ({
+            id: doc.id,
+            ...doc.data(),
+          }));
+ 
+        }, (error) => {
+          this.$toast.error(`Error occured ${error}`);
+        }
+        )
+      }
+    }
 };
 </script>
 

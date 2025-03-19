@@ -1,47 +1,83 @@
 <template>
   <div class="kanban-card">
     <div v-if="isEditing" class="task-edit">
-      <input  placeholder="Task Name" class="input-field" />
-      <input  type="date" class="input-field" />
-      <select class="input-field">
-        <option value="low">Low</option>
-        <option value="medium">Medium</option>
-        <option value="high">High</option>
+      <input placeholder="Task Name" class="input-field" v-model="taskCopy.name" />
+      <input placeholder="Description" class="input-field" v-model="taskCopy.description" />
+      <input type="date" class="input-field" v-model="taskCopy.duedate" />
+      <select class="input-field" v-model="taskCopy.status">
+        <option value="Not Started">Not Started</option>
+        <option value="In Progress">In Progress</option>
+        <option value="Completed">Completed</option>
       </select>
-      <button @click="saveEdit" class="button save-button">Save</button>
+      <select class="input-field" v-model="taskCopy.priority" required>
+        <option value="Low">Low</option>
+        <option value="Medium">Medium</option>
+        <option value="High">High</option>
+      </select>
+      <button @click="saveEdit(taskCopy.id)" class="button save-button">Save</button>
       <button @click="cancelEdit" class="button cancel-button">Cancel</button>
     </div>
     <div v-else>
-      <h4 @click="editTask" class="card-title">Name</h4>
-      <p class="card-details">Due: Due date</p>
-      <p class="card-details">Priority</p>
+      <h4 @click="editTask" class="card-title">{{ task.name }}</h4>
+      <p class="card-details">About: {{ task.description }}</p>
+      <p class="card-details">Due: {{ task.duedate }}</p>
+      <p class="card-details">Priority: {{ task.priority }}</p>
       <div class="card-actions">
-        <button @click="editTask" class="button edit-button">Edit</button>
-        <button @click="deleteTask" class="button delete-button">Delete</button>
+        <button @click="editTask()" class="button edit-button">Edit</button>
+        <button @click="deleteTask(task.id)" class="button delete-button">Delete</button>
       </div>
     </div>
   </div>
 </template>
 
 <script>
+import { updateDoc, doc, db, deleteDoc, auth } from "../firebase"
 export default {
+  props: {
+    task: Object,
+  },
   data() {
     return {
       isEditing: false,
+      taskCopy: { ...this.task },
     };
   },
   methods: {
-    editTask() {
+    async editTask() {
       this.isEditing = true;
+      this.taskCopy = { ...this.task };
     },
-    saveEdit() {
+    async saveEdit(id) {
       this.isEditing = false;
+      this.$emit('update-task', this.taskCopy);
+      try {
+        const user = auth.currentUser;
+        await updateDoc(doc(db, "task", id), {
+          name: this.taskCopy.name,
+          description: this.taskCopy.description,
+          duedate: this.taskCopy.duedate,
+          priority: this.taskCopy.priority,
+          status: this.taskCopy.status,
+          user: user.uid
+        });
+        this.$toast.success("Successfully updated your recipe!");
+      } catch (error) {
+        this.$toast.error("There was an error editing your recipe!");
+      }
     },
     cancelEdit() {
       this.isEditing = false;
+      this.taskCopy = { ...this.task };
     },
-    deleteTask() {
-      console.log('delete')
+    async deleteTask(id) {
+      this.$emit('delete-task', this.task.id);
+      try {
+        await deleteDoc(doc(db, "task", id));
+        this.$toast.success("Successfully deleted task!");
+      } catch (error) {
+        this.$toast.error("Could not delete task!");
+      }
+
     }
   }
 };
@@ -65,14 +101,15 @@ export default {
 
 .task-edit input,
 .task-edit select {
-  width: 100%;
+  width: 90%;
   padding: 10px;
   margin-bottom: 10px;
   border: 1px solid #ddd;
   border-radius: 6px;
   font-size: 16px;
 }
-.card-actions{
+
+.card-actions {
   display: flex;
   gap: 6px
 }
