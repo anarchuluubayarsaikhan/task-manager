@@ -124,4 +124,12 @@ export default {
   justify-content: center;
   min-height: 100vh;
 }
+
+@media(max-width:1000px){
+  .kanban-board{
+    display: grid;
+    gap: 40px;
+    grid-column: 1fr;
+  }
+}
 </style>

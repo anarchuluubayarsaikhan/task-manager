@@ -63,7 +63,7 @@ export default {
             filtered = filtered.filter(task => {
               return (this.duedateOptions.upcoming && task.duedate > this.formattedDate) ||
                 (this.duedateOptions.today && task.duedate == this.formattedDate) ||
-                (this.priorityLevels.overdue && task.duedate < this.formattedDate);
+                (this.duedateOptions.overdue && task.duedate < this.formattedDate);
             });
           }
       return filtered;
