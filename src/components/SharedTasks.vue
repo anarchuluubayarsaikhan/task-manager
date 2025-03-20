@@ -221,5 +221,8 @@ select:focus {
         gap: 40px;
         grid-column: 1fr;
     }
+    .kanban-card{
+        width: 100%;
+    }
 }
 </style>
