@@ -1,9 +1,6 @@
 <template>
   <div id="home">
-    <div v-if="user" class="headercontainer">
-      <h3>Welcome, {{ user.email.split('@')[0] }}</h3>
-      <button @click="signOut" id="signout">Sign Out</button>
-    </div>
+    <HeaderComponent/>
     <div class="tasks-container">
       <div class="sidebar">
         <label class="sidebar-label">
@@ -45,17 +42,26 @@
           </label>
         </div>
       </div>
-      <KanbanBoard :priorityLevels="priorityLevels" :duedateOptions="duedateOptions"/>
+      <div>
+        <KanbanBoard :priorityLevels="priorityLevels" :duedateOptions="duedateOptions"/>
+        <div>
+          <h4> TASKS SHARED WITH YOU:</h4>
+          <SharedTasks/>
+        </div>
+      </div>
     </div>
   </div>
 </template>
 
 <script>
+import HeaderComponent from '@/components/HeaderComponent.vue';
 import KanbanBoard from '@/components/KanbanBoard.vue';
-import { signOut, auth } from '../firebase'
+import SharedTasks from '@/components/SharedTasks.vue';
 export default {
   components: {
-    KanbanBoard
+    KanbanBoard,
+    HeaderComponent,
+    SharedTasks
   },
   data() {
     return {
@@ -73,52 +79,10 @@ export default {
       },
     };
   },
-  computed: {
-    user() {
-      const user = this.$store.getters.user;
-      return user;
-    },
-  },
-  methods: {
-    async signOut() {
-      try {
-        await signOut(auth);
-        localStorage.removeItem("reminded");
-      } catch (error) {
-        this.$toast.error(`Error occurred! ${error}`);
-      }
-    },
-  }
 }
 </script>
 
 <style>
-#signout {
-  padding-top: 8px;
-  padding-bottom: 8px;
-  padding-left: 12px;
-  padding-right: 12px;
-  margin: 10px 0;
-  border-radius: 4px;
-  font-size: 12px;
-  cursor: pointer;
-  transition: background-color 0.3s ease, transform 0.2s ease;
-  width: 8%;
-}
-
-#signout:hover {
-  transform: translateY(-2px);
-  background-color: grey;
-}
-
-h3 {
-  font-size: 26px;
-  color: grey
-}
-
-#signout:active {
-  transform: translateY(0);
-}
 
 #home {
   width: 100%;
@@ -134,14 +98,20 @@ h3 {
   justify-content: space-between;
   align-items: center;
 }
+h4{
+  margin-left: 32px;
+  font-size: 18px;
+  color: grey
+}
 
 .sidebar {
   background-color: #f4f7fb;
-  width: 22%;
+  width: 25%;
   padding: 20px;
   border-radius: 10px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   transition: all 0.3s ease;
+  max-height:80vh;
 }
 
 .sidebar:hover {
@@ -175,7 +145,7 @@ input[type="checkbox"]:hover{
 
 .tasks-container {
   display: flex;
-  gap: 40px;
+  gap: 16px;
   max-width: 1200px;
   margin: auto;
   font-size: 18px;
@@ -184,4 +154,38 @@ input[type="checkbox"]:hover{
 .sidebar > div {
   padding-left: 15px; 
 }
+
+
+@media (max-width: 768px) {
+  .headercontainer {
+    flex-direction: column; 
+    align-items: flex-start;
+  }
+
+  h4 {
+    font-size: 16px; 
+  }
+
+  .sidebar {
+    max-width: 60%;
+    padding: 12px;
+    margin:auto
+  }
+
+  .tasks-container {
+    flex-direction: column; 
+    gap: 10px;
+  }
+
+  .tasks-container > div {
+    width: 100%;
+    padding: 8px;
+  }
+
+  .sidebar-label {
+    font-size: 14px; 
+    padding: 8px;
+  }
+}
+
 </style>

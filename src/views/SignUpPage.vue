@@ -157,4 +157,22 @@ button:disabled {
   cursor: not-allowed;
   opacity: 0.6;
 }
+@media (max-width: 768px) {
+  .signup {
+    width: 80%; 
+    padding: 20px;
+  }
+
+  input {
+    font-size: 16px;
+  }
+
+  button {
+    font-size: 14px; 
+  }
+
+  .sign-in-btn, .sign-up-btn {
+    padding: 12px;
+  }
+}
 </style>

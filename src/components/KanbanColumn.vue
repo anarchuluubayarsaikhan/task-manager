@@ -79,7 +79,8 @@ export default {
         description: "",
         duedate: "",
         status: "Not Started",
-        priority: "Low"
+        priority: "Low",
+        participants:[]
       },
       isVisible: false,
     }
@@ -95,7 +96,9 @@ export default {
             duedate: this.task.duedate,
             status: this.task.status,
             priority: this.task.priority,
-            user: user.uid
+            user: user.uid,
+            participants :[],
+            owner:user.email
           });
           this.task = {}
           this.$toast.success('Successfully added task');

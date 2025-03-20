@@ -14,8 +14,8 @@
         <option value="Medium">Medium</option>
         <option value="High">High</option>
       </select>
-      <button @click="saveEdit(taskCopy.id)" class="button save-button">Save</button>
-      <button @click="cancelEdit" class="button cancel-button">Cancel</button>
+      <button @click="saveEdit(taskCopy.id)" class="save-button">Save</button>
+      <button @click="cancelEdit" class="cancel-button">Cancel</button>
     </div>
     <div v-else>
       <h4 @click="editTask" class="card-title">{{ task.name }}</h4>
@@ -23,14 +23,24 @@
       <p class="card-details">Due: {{ task.duedate }}</p>
       <p class="card-details">Priority: {{ task.priority }}</p>
       <div class="card-actions">
-        <button @click="editTask()" class="button edit-button">Edit</button>
-        <button @click="deleteTask(task.id)" class="button delete-button">Delete</button>
+        <button @click="editTask()" class="edit-button">Edit</button>
+        <button @click="deleteTask(task.id)" class="delete-button">Delete</button>
+        <button @click="shareTask()" class="share-button">Share</button>
+      </div>
+      <div class="email-share-container" v-if="inputVisible">
+        <input type="email" placeholder="Enter the email to share with" class="email-share" v-model="sharedtoUser"
+          required />
+        <div class="share-buttons-container">
+          <button @click="closeInput()" id="close-button">Close</button>
+          <button @click="confirmSharingTask(task.id, task.participants)" id="confirm-button">Confirm</button>
+        </div>
       </div>
     </div>
   </div>
 </template>
 
 <script>
+import { arrayUnion } from "firebase/firestore";
 import { updateDoc, doc, db, deleteDoc, auth } from "../firebase"
 export default {
   props: {
@@ -40,6 +50,9 @@ export default {
     return {
       isEditing: false,
       taskCopy: { ...this.task },
+      inputVisible: false,
+      sharingEmail: "",
+      sharedtoUser: ""
     };
   },
   methods: {
@@ -60,9 +73,10 @@ export default {
           status: this.taskCopy.status,
           user: user.uid
         });
-        this.$toast.success("Successfully updated your recipe!");
+        this.$toast.success("Successfully updated your task!");
       } catch (error) {
-        this.$toast.error("There was an error editing your recipe!");
+        this.$toast.error("There was an error editing your task!");
+        console.log(error)
       }
     },
     cancelEdit() {
@@ -76,6 +90,34 @@ export default {
         this.$toast.success("Successfully deleted task!");
       } catch (error) {
         this.$toast.error("Could not delete task!");
+      }
+    },
+    shareTask() {
+      this.inputVisible = true
+    },
+    closeInput() {
+      this.inputVisible = false
+    },
+    async confirmSharingTask(id, participants) {
+      try {
+        if (this.sharedtoUser.length < 3 && !this.sharedtoUser.includes("@")) {
+          this.$toast.error("Invalid email.");
+        }
+        else if (participants.includes(this.sharedtoUser)) {
+          this.$toast.error("Already shared to this email!");
+          this.sharedtoUser = ""
+        }
+        else {
+          await updateDoc(doc(db, "task", id), {
+            participants: arrayUnion(this.sharedtoUser)
+          })
+          this.$toast.success(`Task successfully shared to ${this.sharedtoUser}!`);
+          this.sharedtoUser = ""
+        }
+      }
+      catch (error) {
+        this.$toast.error("There was an error sharing the task.");
+        console.log(error)
       }
 
     }
@@ -99,6 +141,10 @@ export default {
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
 }
 
+.share-button:hover {
+  background-color: grey;
+}
+
 .task-edit input,
 .task-edit select {
   width: 90%;
@@ -111,7 +157,7 @@ export default {
 
 .card-actions {
   display: flex;
-  gap: 6px
+  gap: 6px;
 }
 
 .card-title {
@@ -123,6 +169,12 @@ export default {
 .card-details {
   font-size: 14px;
   color: #888;
+}
+
+.share-buttons-container {
+  display: flex;
+  gap: 4px;
+  align-self: self-end;
 }
 
 button {
@@ -162,13 +214,44 @@ button:hover {
 }
 
 button.edit-button:hover {
-  background-color: #ffe6e6;
-  color: black
+  background-color: green;
+  color: black;
 }
 
 button.delete-button:hover {
   background-color: #e31e17;
-  color: white
+  color: white;
+}
+
+.email-share-container {
+  margin-top: 15px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.email-share {
+  width: 90%;
+  padding: 12px;
+  margin-top: 10px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 16px;
+  box-sizing: border-box
+}
+
+#confirm-button {
+  background-color: grey;
+}
+
+#confirm-button:hover {
+  background-color: green;
+  color: white;
+}
+
+#close-button:hover {
+  background-color: gainsboro;
+  color: white;
 }
 
 input:focus,
