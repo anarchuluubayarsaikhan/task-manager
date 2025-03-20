@@ -69,7 +69,7 @@ export default {
         }
       } catch (error) {
         console.log(error);
-        this.$toast.error(`Could not add task! ${error}`);
+        this.$toast.error(`Could not add task!`);
       }
     },
     async getTasks() {

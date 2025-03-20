@@ -44,7 +44,7 @@ export default {
         this.$router.push('/home');
       } catch (error) {
         console.log(error)
-        this.$toast.error(`Could not sign up! ${error}`);
+        this.$toast.error(`Could not sign up!`);
       } finally {
         this.isLoading = false;  
       }
@@ -53,7 +53,8 @@ export default {
       try {
         await signOut(auth);
       } catch (error) {
-        this.$toast.error(`Could not sign out! ${error}`);
+        this.$toast.error(`Could not sign out!`);
+        console.log(error)
       }
     },
   },

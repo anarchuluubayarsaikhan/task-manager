@@ -104,7 +104,8 @@ export default {
           this.$toast.success('Successfully added task');
         }
       } catch (error) {
-        this.$toast.error(`Could not add task! ${error}`);
+        this.$toast.error(`Could not add task!`);
+        console.log(error)
       }
     },
     addTask() {

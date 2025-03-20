@@ -1,7 +1,7 @@
 <template>
     <div>
         <div class="board" v-if="tasks.length<=0">
-            No shared tasks yet
+            No shared tasks yet!
         </div>
             <div class="kanban-column"  v-if="tasks.length>0">
                 <div class="kanban-card" v-for="task in tasks" :key="task.id">
@@ -113,6 +113,16 @@ export default {
     transition: all 0.3s ease;
     display: grid;
     grid-template-columns: 1fr 1fr 1fr;
+}
+.board {
+    background-color: white;
+    padding: 30px 40px;
+    width: 50%;
+    border-style: solid;
+    border-radius: 12px;
+    margin: auto;
+    text-align: center;
+    margin-bottom: 40px;
 }
 
 .kanban-column:hover {

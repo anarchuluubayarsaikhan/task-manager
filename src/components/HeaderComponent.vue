@@ -19,7 +19,8 @@ export default {
                 await signOut(auth);
                 localStorage.removeItem("reminded");
             } catch (error) {
-                this.$toast.error(`Error occurred! ${error}`);
+                this.$toast.error(`Could not sign out!`);
+                console.log(error)
             }
         },
     }

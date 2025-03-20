@@ -44,7 +44,8 @@ export default {
         await signInWithEmailAndPassword(auth, this.email, this.password);
         this.$router.push('/home');
       } catch (error) {
-        this.$toast.error(`Could not sign in! ${error}`);
+        this.$toast.error(`Could not sign in!`);
+        console.log(error)
       } finally {
         this.isLoading = false; 
       }
@@ -56,7 +57,8 @@ export default {
           await sendEmailVerification(this.user);
           alert("Verification email sent.");
         } catch (error) {
-          this.$toast.error(`Could not send email! ${error}`);
+          this.$toast.error(`Could not send email!`);
+          console.log(error)
         }
       }
     },
@@ -66,7 +68,8 @@ export default {
         await sendPasswordResetEmail(auth, this.email);
         this.$toast.success(`Password reset email sent.`);
       } catch (error) {
-        this.$toast.error(`Could not reset password! ${error}`);
+        this.$toast.error(`Could not reset password!`);
+        console.log(error)
       }
     },
 
@@ -74,7 +77,8 @@ export default {
       try {
         await signOut(auth);
       } catch (error) {
-        this.$toast.error(`Error occurred! ${error}`);
+        this.$toast.error(`Could not sign out! `);
+        console.log(error)
       }
     },
   },
