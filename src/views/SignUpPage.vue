@@ -41,7 +41,7 @@ export default {
       this.isLoading = true; 
       try {
         await createUserWithEmailAndPassword(auth, this.email, this.password);
-        this.$router.push('/home');
+        this.$router.push('/login');
       } catch (error) {
         console.log(error)
         this.$toast.error(`Could not sign up!`);
