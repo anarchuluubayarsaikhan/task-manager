@@ -14,7 +14,7 @@
    </div>
    <div v-if="user">
      <h3>Welcome, {{ user.email }}</h3>
-     <button @click="getStarted">Get started</button>
+     <button @click="getStarted" id="getSartedButton">Get started</button>
      <button @click="signOut">Sign Out</button>
    </div>
  </div>
@@ -159,6 +159,16 @@ button:active {
 button:disabled {
   cursor: not-allowed;
   opacity: 0.6;
+}
+#getSartedButton{
+  background-color: grey;
+}
+#getSartedButton{
+  background-color: #D3D3D3 ;
+}
+#getSartedButton:hover{
+  background-color: gray;
+  color: white;
 }
 @media (max-width: 768px) {
   .signup {
