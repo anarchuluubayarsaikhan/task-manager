@@ -97,8 +97,9 @@ export default {
         if (this.tasks.length > 0) {
           this.tasks.forEach(task => {
             const dueDate = task.duedate;
+            const status = task.status
 
-            if (dueDate === this.formattedDate) {
+            if (dueDate === this.formattedDate && status !=="Completed") {
               this.$toast.success(`Reminder: today is due date for task: ${task.name}!`);
               localStorage.setItem("reminded", "true");
             }
