@@ -14,8 +14,8 @@
    </div>
    <div v-if="user">
      <h3>Welcome, {{ user.email }}</h3>
+     <button @click="getStarted">Get started</button>
      <button @click="signOut">Sign Out</button>
-     <button v-if="!user.emailVerified" @click="sendEmailVerification">Send Verification Email</button>
    </div>
  </div>
 </template>
@@ -41,7 +41,6 @@ export default {
       this.isLoading = true; 
       try {
         await createUserWithEmailAndPassword(auth, this.email, this.password);
-        this.$router.push('/login');
       } catch (error) {
         console.log(error)
         this.$toast.error(`Could not sign up!`);
@@ -57,6 +56,9 @@ export default {
         console.log(error)
       }
     },
+    getStarted(){
+      this.$router.push("/home")
+    }
   },
 };
 </script>
