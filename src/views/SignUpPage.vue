@@ -51,6 +51,7 @@ export default {
     async signOut() {
       try {
         await signOut(auth);
+        this.$router.push("/login")
       } catch (error) {
         this.$toast.error(`Could not sign out!`);
         console.log(error)
